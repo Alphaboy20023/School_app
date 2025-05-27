@@ -13,6 +13,7 @@ import os
 from datetime import timedelta
 from pathlib import Path
 from dotenv import load_dotenv
+import dj_database_url 
 
 load_dotenv()
 
@@ -20,21 +21,36 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-6n2k2*$x3f$ly4#-l_9ta+$q3)$+9xhqr3pp947i5thmk++svb'
+SECRET_KEY =  os.environ.get( 'SECRET_KEY' ,'django-insecure-6n2k2*$x3f$ly4#-l_9ta+$q3)$+9xhqr3pp947i5thmk++svb')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+
+# * allows any host
+ALLOWED_HOSTS = ['*']
 
 AUTH_USER_MODEL = 'school_app.CustomUser'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media' )
+
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2', # Change to PostgreSQL
+        'NAME': 'your_db_name', # Local fallback, Heroku will override
+        'USER': 'your_db_user', # Local fallback
+        'PASSWORD': 'your_db_password', # Local fallback
+        'HOST': 'localhost', # Local fallback
+        'PORT': '', # Local fallback
+    }
+}
+
+# Override database settings with Heroku's DATABASE_URL
+db_from_env = dj_database_url.config(conn_max_age=500)
+DATABASES['default'].update(db_from_env)
 
 
 # Application definition
@@ -62,6 +78,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 CORS_ALLOWED_ORIGINS = [
@@ -137,10 +154,16 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') # Collects all static files here
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'), # all static files go here
+]
+
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL= '/media/'
 MEDIA_ROOT= os.path.join(BASE_DIR, 'media')
