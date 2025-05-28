@@ -17,7 +17,7 @@ from .models import (Exam, Student, Payment, Receipt, LecturerProfile,
                      Notification, Department, Course, Calendar, TimeTable
                      )
 from django.contrib.auth import authenticate
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError 
 
 # Create your views here.
 class RegisterView(APIView):

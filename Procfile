@@ -1,1 +1,1 @@
-web: gunicorn school_inventory.wsgi
+web: gunicorn school_inventory.wsgi:application

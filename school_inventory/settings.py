@@ -21,10 +21,9 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY =  os.environ.get( 'SECRET_KEY' ,'django-insecure-6n2k2*$x3f$ly4#-l_9ta+$q3)$+9xhqr3pp947i5thmk++svb')
 
-# SECURITY WARNING: don't run with debug turned on in production!
+
 DEBUG = False
 
 
@@ -39,16 +38,16 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media' )
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2', # Change to PostgreSQL
-        'NAME': 'your_db_name', # Local fallback, Heroku will override
-        'USER': 'your_db_user', # Local fallback
-        'PASSWORD': 'your_db_password', # Local fallback
-        'HOST': 'localhost', # Local fallback
-        'PORT': '', # Local fallback
+        'ENGINE': 'django.db.backends.postgresql_psycopg2', 
+        'NAME': 'your_db_name', 
+        'USER': 'your_db_user', 
+        'PASSWORD': 'your_db_password', 
+        'HOST': 'localhost', 
+        'PORT': '', 
     }
 }
 
-# Override database settings with Heroku's DATABASE_URL
+
 db_from_env = dj_database_url.config(conn_max_age=500)
 DATABASES['default'].update(db_from_env)
 
@@ -77,12 +76,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000"
 ]
 
 ROOT_URLCONF = 'school_inventory.urls'
@@ -112,8 +109,7 @@ REST_FRAMEWORK = {
 WSGI_APPLICATION = 'school_inventory.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+
 
 DATABASES = {
     'default': {
@@ -123,8 +119,7 @@ DATABASES = {
 }
 
 
-# Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -142,8 +137,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
+
 
 LANGUAGE_CODE = 'en-us'
 
@@ -154,10 +148,10 @@ USE_I18N = True
 USE_TZ = True
 
 
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
+
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') # Collects all static files here
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') #  static files are collected here
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'), # all static files go here
 ]
@@ -168,8 +162,6 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL= '/media/'
 MEDIA_ROOT= os.path.join(BASE_DIR, 'media')
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
