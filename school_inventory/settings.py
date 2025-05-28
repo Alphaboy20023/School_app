@@ -14,6 +14,7 @@ from datetime import timedelta
 from pathlib import Path
 from dotenv import load_dotenv
 import dj_database_url
+import dj_database_url
 
 load_dotenv()
 
@@ -43,6 +44,9 @@ DATABASES = {
     )
 }
 
+DATABASES=["default"] = dj_database_url.parse("postgresql://school_app_lkvq_user:U453rzywogAiCaKaGXO3gO4A6IMozUNn@dpg-d0rh0fmmcj7s738983rg-a.oregon-postgres.render.com/school_app_lkvq")
+
+# 
 
 INSTALLED_APPS = [
     'django.contrib.admin',
