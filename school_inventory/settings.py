@@ -27,7 +27,10 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-6n2k2*$x3f$ly4#-l_9ta
 DEBUG = False
 
 # * allow any host
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['school-app-inventory.onrender.com'] 
+
+
+# Then api link to interact with frontend is "school-app-inventory.onrender.com/api/token/<link> "
 
 
 AUTH_USER_MODEL = 'school_app.CustomUser'
@@ -46,6 +49,8 @@ DATABASES = {
 
 
 
+
+
 DATABASES = {
     'default': dj_database_url.parse(
         os.environ.get('DATABASE_URL'),
@@ -54,7 +59,7 @@ DATABASES = {
     )
 }
 
-print("DATABASE_URL:", os.environ.get('DATABASE_URL'))
+# print("DATABASE_URL:", os.environ.get('DATABASE_URL'))
 
 
 

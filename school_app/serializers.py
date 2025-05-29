@@ -541,4 +541,17 @@ class NotificationSerializer(serializers.ModelSerializer):
         user.save()
         return user   
     
+    
+class CalendarSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Calendar
+        fields = ['id','event_name', 'description', 'event_date', 'start_time', 'end_time', 'event_type']
+        
+    def create(self, validated_data):
+        calendar = Calendar.objects.create(**validated_data)
+        calendar.save()
+        return calendar
+    
+    #def
+    
 

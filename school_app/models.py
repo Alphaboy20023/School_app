@@ -108,7 +108,7 @@ class Student(TimeStampField):
     department = models.ForeignKey('Department', on_delete=models.CASCADE, null=True)
     admission_number=models.CharField(max_length=50, unique=True, blank=True, null=True)
     faculty = models.CharField(choices=faculty_choices, max_length=50, blank=True)
-    picture = models.ImageField(upload_to='media/', blank=True, null=True)
+    picture = models.ImageField(upload_to='media/students', blank=True, null=True)
     
     
     
@@ -355,6 +355,7 @@ event_type_choices = {
     'Deadline':'Deadline'
 }
 
+
 class Calendar(TimeStampField):
     event_name = models.CharField(max_length=255, blank=True)
     description = models.TextField(max_length=255, blank=True)
@@ -378,6 +379,7 @@ day_choices = {
     'Friday':'Friday',
     'Saturday':'Saturday'
 }
+
 
 class TimeTable(TimeStampField):
     week_day = models.CharField( choices=day_choices, default='Monday')

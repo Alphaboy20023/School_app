@@ -1,5 +1,10 @@
 from django.contrib import admin
-from .models import Student, Payment, Receipt, Department, Course, CustomUser, Exam, Question, Result, IdentityCard, AcademicSession
+from .models import (Student, Payment, 
+                     Receipt, Department, Course, CustomUser, 
+                     Exam, Question, Result, IdentityCard, AcademicSession,
+                     Calendar, Post, TimeTable, Repost, Announcement, Comment, LecturerProfile,
+                     Lecture
+                     )
 from datetime import date 
 
 # Register your models here.
@@ -37,6 +42,16 @@ admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Exam)
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(Result)
-admin.site.register(IdentityCard)
 admin.site.register(AcademicSession, AcademicSessionAdmin)
+admin.site.register(IdentityCard)
+admin.site.register(Calendar)
+admin.site.register(Post)
+admin.site.register(TimeTable)
+admin.site.register(Repost)
+admin.site.register(Comment)
+admin.site.register(Announcement)
+admin.site.register(LecturerProfile)
+admin.site.register(Lecture)
+
+
 
