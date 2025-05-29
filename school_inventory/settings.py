@@ -44,9 +44,19 @@ DATABASES = {
     )
 }
 
-# DATABASES=["default"] = dj_database_url.parse("postgresql://school_app_lkvq_user:U453rzywogAiCaKaGXO3gO4A6IMozUNn@dpg-d0rh0fmmcj7s738983rg-a.oregon-postgres.render.com/school_app_lkvq")
 
-# 
+
+DATABASES = {
+    'default': dj_database_url.parse(
+        os.environ.get('DATABASE_URL'),
+        conn_max_age=600,
+        ssl_require=True
+    )
+}
+
+print("DATABASE_URL:", os.environ.get('DATABASE_URL'))
+
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
