@@ -33,35 +33,28 @@ ALLOWED_HOSTS = ['school-app-inventory.onrender.com']
 # Then api link to interact with frontend is "school-app-inventory.onrender.com/api/token/<link> "
 
 
-AUTH_USER_MODEL = 'school_app.CustomUser'
+AUTH_USER_MODEL = 'accounts_app.CustomUser'
 
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),
-        conn_max_age=600
-    )
-}
+DATABASE_URL = os.environ.get('DATABASE_URL')
 
-
-
-
-
-DATABASES = {
-    'default': dj_database_url.parse(
-        os.environ.get('DATABASE_URL'),
-        conn_max_age=600,
-        ssl_require=True
-    )
-}
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=True)
+    }
+else:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),
+            conn_max_age=600
+        )
+    }
 
 # print("DATABASE_URL:", os.environ.get('DATABASE_URL'))
-
-
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -72,6 +65,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'school_app',
+    'accounts_app',
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
@@ -113,15 +107,18 @@ WSGI_APPLICATION = 'school_inventory.wsgi.application'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
     )
 }
 
 # Static files configuration
-STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # static files are collected here
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),  # all static files go here
-]
+#STATIC_URL = 'static/'
+#STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # static files are collected here
+#STATICFILES_DIRS = [
+ #   os.path.join(BASE_DIR, 'static'),  # all static files go here
+#]
 
 if not DEBUG:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

@@ -19,5 +19,12 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('v1/',include('school_app.urls'))
+    path('school/', include('school_app.urls')), # school/api/payments {no tokens here }
+    path('auth/', include('accounts_app.urls')) ,# JWT Tokens live here so api is auth/api/token/refresh
+    #path('library/', include('library_app.urls'))
+
 ]
+
+"""
+there is  nothing like school/api/token/refresh? hope token wont affect? 
+"""

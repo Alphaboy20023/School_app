@@ -1,154 +1,13 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.dispatch import receiver
-from django.db import models, transaction
+from django.db import models
 from django.utils import timezone
-from datetime import  date, timedelta
 import datetime
-from django.db.models import F
 from decimal import Decimal
 import uuid
+from accounts_app.models import TimeStampField, CustomUser, faculty_choices, UserTypes
 
 # Create your models here.
-class UserManager(BaseUserManager):
-
-    use_in_migration = True
-
-    def create_user(self, email, password=None, **extra_fields):
-        if not email:
-            raise ValueError('Email is Required')
-        user = self.model(email=self.normalize_email(email), **extra_fields)
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-
-    def create_superuser(self, email, password, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-        extra_fields.setdefault('is_active', True)
-
-        if extra_fields.get('is_staff') is not True:
-            raise ValueError('Superuser must have is_staff = True')
-        if extra_fields.get('is_superuser') is not True:
-            raise ValueError('Superuser must have is_superuser = True')
-
-        return self.create_user(email, password, **extra_fields)
-
-
-class UserTypes(models.TextChoices):
-    STUDENT= 'Student', 'Student'
-    LECTURER= 'Lecturer', 'Lecturer'
-
-class CustomUser(AbstractUser):
-
-    # username = None
-    username = models.CharField(max_length=100, unique=True)
-    email = models.EmailField(max_length=100, unique=True)
-    phone_number = models.CharField(max_length=20, blank=True, null=True)
-    user_type = models.CharField(choices=UserTypes.choices, blank=True, null=True, max_length=20, default=UserTypes.STUDENT)
-    date_joined = models.DateTimeField(auto_now_add=True)
-    
-    is_admin = models.BooleanField(default=False)
-    is_hod= models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    is_superuser = models.BooleanField(default=False)
-
-    objects = UserManager()
-
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email']
-
-    def __str__(self):
-        return f'{self.username}'
-
-class TimeStampField(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    # wont create this class in db except i call it
-    class Meta:
-        abstract = True
-
-
-class AdmissionNumberCounter(models.Model):
-    year = models.IntegerField(unique=True)
-    last_number = models.IntegerField(default=0)
-
-    @classmethod
-    def get_next_number(cls):
-        year = datetime.datetime.now().year
-        with transaction.atomic():
-            counter, created = cls.objects.get_or_create(year=year, defaults={'last_number': 0})
-            counter.last_number = F('last_number') + 1
-            counter.save()
-            return cls.objects.get(year=year).last_number
-
-faculty_choices ={
-    "Faculty of Science":"Faculty of Science",
-    "Faculty of Arts":"Faculty of Arts",
-    "Faculty of Engineering":"Faculty of Engineering",
-    "Faculty of Education":"Faculty of Education",
-    "Faculty of Clinical Sciences":"Faculty of Clinical Science",
-    "Faculty of Commerce and Business":"Faculty of Commerce and Business",
-    "Fcaulty of Allied Health Sciences":"Fcaulty of Allied Health Sciences",
-    "Faculty of Law":"Faculty of Law",
-    "Faculty of Management Sciences":"Faculty of Management Sciences",
-    "School of Transport":"School of Transport",
-    "Faculty of Social Sciences":"Faculty of Social Sciences",
-    "School of Post Graduate Studies":"School of Post Graduate Studies",
-    
-}
-
-
-class Student(TimeStampField):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, limit_choices_to={'user_type':UserTypes.STUDENT})
-    date_of_birth=models.DateField(blank=True, null=True)
-    current_session = models.DateField()
-    department = models.ForeignKey('Department', on_delete=models.CASCADE, null=True)
-    admission_number=models.CharField(max_length=50, unique=True, blank=True, null=True)
-    faculty = models.CharField(choices=faculty_choices, max_length=50, blank=True)
-    picture = models.ImageField(upload_to='media/students', blank=True, null=True)
-    
-    
-    
-
-    def get_age(self):
-        if self.date_of_birth:
-            today = date.today()
-            age = today.year - self.date_of_birth.year
-            if (today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day):
-                age -= 1
-    
-    
-    def generate_admission_number(self):
-        year = datetime.datetime.now().year
-        next_number = AdmissionNumberCounter.get_next_number()
-        return f'ADM{next_number:03d}'
-
-    def save(self, *args, **kwargs):
-        self.full_clean()
-        if not self.admission_number:
-            self.admission_number = self.generate_admission_number()
-        
-        
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return f"{self.user.get_full_name()} ({self.admission_number})"
-    
-    
-class LecturerProfile(TimeStampField):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, limit_choices_to={'user_type':UserTypes.LECTURER})
-    # department = 
-    staff_id = models.CharField(max_length=100, null=True, blank=True)
-    rank = models.CharField(max_length=100, blank=True, null=True) # maybe a professor, Doctor e.t.c
-    office_location = models.CharField(max_length=100, blank=True, null=True)
-    picture = models.ImageField(upload_to='media/lecturers')
-    
-    def __str__(self):
-        return f'{self.user.get_full_name()} - ({self.staff_id})'
-    
 
 class AcademicSession(TimeStampField):
     name = models.CharField(max_length=20, unique=True)
@@ -166,7 +25,7 @@ Status_choices= {
 
 class Payment(TimeStampField):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='user')
-    admission_number = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='student')
+    admission_number = models.ForeignKey('accounts_app.Student', on_delete=models.CASCADE, related_name='student')
     admin_fee=models.DecimalField(max_digits=8, decimal_places=2)
     course_fee=models.DecimalField(max_digits=8, decimal_places=2, default=Decimal('0.00'))
     library_fee = models.DecimalField(max_digits=8, decimal_places=2, default=Decimal('0.00')) 
@@ -175,7 +34,8 @@ class Payment(TimeStampField):
     transaction_id = models.CharField(max_length=20, null=True, blank=True)
     
     def save(self, *args, **kwargs):
-        self.total = self.admin_fee + self.course_fee + self.library_fee
+        if not self.total:
+            self.total = self.admin_fee + self.course_fee + self.library_fee
         super().save(*args, **kwargs)
         
         
@@ -184,8 +44,7 @@ class Receipt(TimeStampField):
     payment = models.OneToOneField('Payment', on_delete=models.CASCADE, related_name='receipt')
     receipt_number = models.CharField(max_length=30, unique=True, null=True, blank=True)
     issue_date = models.DateTimeField(auto_now_add=True)
-    student_name = models.CharField(max_length=250)
-    admission_number = models.CharField(max_length=50)
+    student_name = models.ForeignKey('accounts_app.Student', on_delete=models.SET_NULL, null=True)
     admin_fee = models.DecimalField(max_digits=8, decimal_places=2)
     course_fee = models.DecimalField(max_digits=8, decimal_places=2)
     library_fee = models.DecimalField(max_digits=8, decimal_places=2)
@@ -201,6 +60,7 @@ class Receipt(TimeStampField):
         unique_id = uuid.uuid4().hex[:8].upper()
         
         return f"RCPT-{year}{month}{day}-{unique_id}"
+    
     def save(self, *args, **kwargs):
         if not self.receipt_number:
             self.receipt_number = self.generate_receipt_number()
@@ -208,10 +68,10 @@ class Receipt(TimeStampField):
             
             
 
-semester_choices= {
-    "First Semester":"First Semester",
-    "Second Semester":"Second Semester"
-}
+semester_choices= [
+    ("First Semester","First Semester"),
+    ("Second Semester","Second Semester")
+]
 
 class Course(TimeStampField):
     course_name = models.CharField(max_length=100)
@@ -229,7 +89,7 @@ class Course(TimeStampField):
     
 class Lecture(TimeStampField):
     course = models.ForeignKey('Course', on_delete=models.CASCADE)
-    lecturer = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    lecturer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, limit_choices_to={'user_type':UserTypes.LECTURER})
     start_time = models.DateTimeField()
     duration= models.DurationField(default=datetime.timedelta(hours=2, minutes=00))
     venue = models.CharField(max_length=150, blank=True)
@@ -241,17 +101,17 @@ class Department(TimeStampField):
     name= models.CharField(max_length=100, unique=True)
     dept_code = models.CharField(max_length=10, unique=True)
     faculty= models.CharField(max_length=100, choices=faculty_choices)
-    hod= models.OneToOneField(CustomUser, on_delete=models.SET_NULL, null=True, related_name="head_of_department")
+    hod= models.OneToOneField(CustomUser, on_delete=models.SET_NULL, null=True, related_name="head_of_department", limit_choices_to={'is_hod':True})
     
     def __str__(self):
         return f'{self.name} - {self.dept_code}'
     
 
 
-exam_choices = {
-    'Test':'Test',
-    'Main Exam':'Main Exam'
-}
+exam_choices = [
+    ('Test','Test'),
+    ('Main Exam','Main Exam')
+]
 
 class Exam(TimeStampField):
     course = models.ForeignKey('Course', on_delete=models.CASCADE)
@@ -271,7 +131,7 @@ class Exam(TimeStampField):
 class Question(TimeStampField):
     exam= models.ForeignKey('Exam', on_delete=models.CASCADE)
     text = models.TextField()
-    is_image= models.ImageField(upload_to='media/', blank=True, null=True)
+    is_image= models.ImageField(upload_to='media/exams', blank=True, null=True)
     option_a = models.CharField(max_length=255)
     option_b = models.CharField(max_length=255)
     option_c = models.CharField(max_length=255)
@@ -288,10 +148,10 @@ class Question(TimeStampField):
     
 class IdentityCard(TimeStampField):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    picture= models.ImageField(upload_to='media/')
+    picture= models.ImageField(upload_to='media/students')
     department= models.ForeignKey('Department', on_delete=models.SET_NULL, null=True)
-    admission_number = models.ForeignKey('Student', on_delete=models.CASCADE, related_name='studentId', null=True)
-    faculty = models.ForeignKey('Student', on_delete=models.CASCADE, related_name='studentFaculty',null=True)
+    admission_number = models.ForeignKey('accounts_app.Student', on_delete=models.CASCADE, related_name='studentId', null=True)
+    faculty = models.CharField(choices=faculty_choices, max_length=50, default=None)
     
     def __str__(self):
         return f'ID Card - {self.user.username} - {self.admission_number}'
@@ -299,7 +159,7 @@ class IdentityCard(TimeStampField):
 
 class Result(TimeStampField): 
     user= models.ForeignKey(CustomUser, on_delete=models.CASCADE, blank=True, null=True)
-    admission_number= models.ForeignKey('Student', on_delete=models.CASCADE, null=True, related_name='studentResult')
+    admission_number= models.ForeignKey('accounts_app.Student', on_delete=models.CASCADE, null=True, related_name='studentResult')
     exam = models.ForeignKey('Exam', on_delete=models.CASCADE, null=True, blank=True)
     course= models.ForeignKey('Course', on_delete=models.CASCADE, null=True, blank=True)
     score= models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
@@ -316,15 +176,15 @@ class Announcement(TimeStampField):
     information = models.CharField(max_length=10000, blank=True)
 
 
-
 class Post(TimeStampField):
     user=models.ForeignKey(CustomUser, on_delete=models.CASCADE, blank=True)
     title = models.CharField(max_length=5000, blank=True)
     content = models.CharField(max_length=5000, blank=True)
     likes = models.ManyToManyField(CustomUser, related_name='liked_posts')
+    image = models.ImageField(upload_to='media/others', null=True)
     
     
-class Repost(Post, TimeStampField):
+class Repost(Post):
     original_post = models.ForeignKey(
         Post, on_delete=models.CASCADE, related_name='original_repost'
     )
@@ -338,7 +198,7 @@ class Comment(TimeStampField):
 
 
 class Notification(TimeStampField):
-    user = models.ForeignKey(CustomUser,on_delete=models.Case)
+    user = models.ForeignKey(CustomUser,on_delete=models.CASCADE,)
     message= models.TextField()
     is_read = models.BooleanField(default=False)
     link = models.URLField(max_length=500, blank=True, null=True)
@@ -347,13 +207,13 @@ class Notification(TimeStampField):
         return f'notification from {self.user.username} - {self.message[:50]}'
 
 
-event_type_choices = {
-    'Academic':'Academic',
-    'Holiday':'Holiday',
-    'Sport':'Sport',
-    'Cultural':'Cultural',
-    'Deadline':'Deadline'
-}
+event_type_choices = [
+    ('Academic','Academic'),
+    ('Holiday','Holiday'),
+    ('Sport','Sport'),
+    ('Cultural','Cultural'),
+    ('Deadline','Deadline')
+]
 
 
 class Calendar(TimeStampField):
@@ -371,14 +231,14 @@ class Calendar(TimeStampField):
         return f'{self.event_name} on {self.event_date}'
     
 
-day_choices = {
-    'Monday':'Monday',
-    'Tuesday':'Tuesday',
-    'Wednesday':'Wednesday',
-    'Thursday':'Thursday',
-    'Friday':'Friday',
-    'Saturday':'Saturday'
-}
+day_choices = [
+    ('Monday','Monday'),
+    ('Tuesday','Tuesday'),
+    ('Wednesday','Wednesday'),
+    ('Thursday','Thursday'),
+    ('Friday','Friday'),
+    ('Saturday','Saturday')
+]
 
 
 class TimeTable(TimeStampField):
@@ -386,7 +246,7 @@ class TimeTable(TimeStampField):
     start_time = models.TimeField(null=True)
     end_time = models.TimeField(null=True)
     course = models.ForeignKey('Course', on_delete=models.CASCADE, null=True)
-    lecturer = models.ForeignKey('CustomUser', on_delete=models.CASCADE, limit_choices_to={'user_type': UserTypes.LECTURER}, null=True)
+    lecturer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, limit_choices_to={'user_type': UserTypes.LECTURER}, null=True)
     academic_session = models.ForeignKey('AcademicSession', on_delete=models.CASCADE, null=True)
     semester = models.CharField(max_length=20, choices=semester_choices, null=True)
     duration= models.DurationField(default=datetime.timedelta(hours=2, minutes=00))
@@ -400,10 +260,7 @@ class TimeTable(TimeStampField):
             'Monday': 1, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4,
             'Friday': 5, 'Saturday': 6, 'Sunday': 7
         }
-        return days.get(self.day_of_week)
+        return days.get(self.week_day)
     
     def __str__(self):
         return f'{self.week_day} - {self.course} - {self.lecturer} - {self.venue}'
-
-
-

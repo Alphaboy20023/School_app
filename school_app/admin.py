@@ -1,10 +1,10 @@
 from django.contrib import admin
-from .models import (Student, Payment, 
-                     Receipt, Department, Course, CustomUser, 
-                     Exam, Question, Result, IdentityCard, AcademicSession,
-                     Calendar, Post, TimeTable, Repost, Announcement, Comment, LecturerProfile,
-                     Lecture
-                     )
+from school_app.models import (Payment, 
+        Receipt, Department, Course, CustomUser, 
+        Exam, Question, Result, IdentityCard, AcademicSession,
+        Calendar, Post, TimeTable, Repost, Announcement, Comment, Lecture )
+
+from accounts_app.models import LecturerProfile, Student
 from datetime import date 
 
 # Register your models here.
@@ -19,7 +19,7 @@ class PaymentAdmin(admin.ModelAdmin):
     list_display=('user','admission_number','admin_fee','course_fee','library_fee','total','status')
 
 class ReceiptAdmin(admin.ModelAdmin):
-    list_display = ('admission_number','course_fee','library_fee','admin_fee','total_amount','receipt_number')
+    list_display = ('course_fee','library_fee','admin_fee','total_amount','receipt_number')
     
 class DepartmentAdmin(admin.ModelAdmin):
     list_display = ('name', 'faculty', 'hod') 
@@ -52,6 +52,5 @@ admin.site.register(Comment)
 admin.site.register(Announcement)
 admin.site.register(LecturerProfile)
 admin.site.register(Lecture)
-
 
 
