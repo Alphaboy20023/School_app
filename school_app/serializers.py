@@ -126,11 +126,11 @@ class IdentityCardSerializer(serializers.ModelSerializer):
         if user.user_type != 'Student':
             raise ValidationError({"user":"Identity cards can only be created for students."})
 
-            #  admission_number is required for students.
+         
         if user.user_type == 'Student' and not data.get('admission_number'):
             raise ValidationError({'admission_number': 'Admission number is required for students.'})
         
-            # faculty and department is required for students
+           
         if user.user_type == 'Student' and not data.get('faculty'):
             raise ValidationError({'faculty': 'Faculty is required for students.'})
 

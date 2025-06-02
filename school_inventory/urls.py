@@ -21,7 +21,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('school/', include('school_app.urls')), # school/api/payments {no tokens here }
     path('auth/', include('accounts_app.urls')) ,# JWT Tokens live here so api is auth/api/token/refresh
-    #path('library/', include('library_app.urls'))
+    path('library/', include('library_app.urls'))
 
 ]
 

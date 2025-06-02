@@ -108,8 +108,8 @@ class Student(TimeStampField):
     department = models.ForeignKey('school_app.Department', on_delete=models.SET_NULL, null=True)
     admission_number=models.CharField(max_length=50, unique=True, blank=True, null=True)
     faculty = models.CharField(choices=faculty_choices, max_length=50, blank=True)
-    picture = models.ImageField(upload_to='media/students', blank=True, null=True)
-    level = models.CharField(max_length=100, null=True)
+    picture = models.ImageField(upload_to='students/', blank=True, null=True)
+    level = models.PositiveSmallIntegerField(choices=[(100, '100'), (200, '200'), (300, '300'), (400, '400')], default=100)
     
     
     
@@ -144,7 +144,7 @@ class LecturerProfile(TimeStampField):
     staff_id = models.CharField(max_length=100, null=True, blank=True)
     rank = models.CharField(max_length=100, blank=True, null=True) # maybe a professor, Doctor e.t.c
     office_location = models.CharField(max_length=100, blank=True, null=True)
-    picture = models.ImageField(upload_to='media/lecturers')
+    picture = models.ImageField(upload_to='lecturers/')
     
     def __str__(self):
         return f'{self.user.get_full_name()} - ({self.staff_id})'

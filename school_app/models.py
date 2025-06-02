@@ -79,7 +79,7 @@ class Course(TimeStampField):
     department = models.ForeignKey('Department', on_delete=models.CASCADE)
     description= models.TextField(blank=True, null=True)
     credit_units= models.PositiveSmallIntegerField()
-    level = models.PositiveSmallIntegerField()
+    level = models.PositiveSmallIntegerField(choices=[(100, '100'), (200, '200'), (300, '300'), (400, '400')], default=100)
     semester= models.CharField(max_length=20, choices=semester_choices)
     lecturer = models.ManyToManyField(CustomUser, related_name='teach_courses', limit_choices_to={'user_type':UserTypes.LECTURER})
     
@@ -131,7 +131,7 @@ class Exam(TimeStampField):
 class Question(TimeStampField):
     exam= models.ForeignKey('Exam', on_delete=models.CASCADE)
     text = models.TextField()
-    is_image= models.ImageField(upload_to='media/exams', blank=True, null=True)
+    is_image= models.ImageField(upload_to='exams/', blank=True, null=True)
     option_a = models.CharField(max_length=255)
     option_b = models.CharField(max_length=255)
     option_c = models.CharField(max_length=255)
@@ -148,7 +148,7 @@ class Question(TimeStampField):
     
 class IdentityCard(TimeStampField):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    picture= models.ImageField(upload_to='media/students')
+    picture= models.ImageField(upload_to='students/')
     department= models.ForeignKey('Department', on_delete=models.SET_NULL, null=True)
     admission_number = models.ForeignKey('accounts_app.Student', on_delete=models.CASCADE, related_name='studentId', null=True)
     faculty = models.CharField(choices=faculty_choices, max_length=50, default=None)
@@ -181,7 +181,7 @@ class Post(TimeStampField):
     title = models.CharField(max_length=5000, blank=True)
     content = models.CharField(max_length=5000, blank=True)
     likes = models.ManyToManyField(CustomUser, related_name='liked_posts')
-    image = models.ImageField(upload_to='media/others', null=True)
+    is_image = models.ImageField(upload_to='others/', null=True)
     
     
 class Repost(Post):

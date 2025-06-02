@@ -24,10 +24,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-6n2k2*$x3f$ly4#-l_9ta+$q3)$+9xhqr3pp947i5thmk++svb')
 
 
-DEBUG = False
+DEBUG = True
 
 # * allow any host
-ALLOWED_HOSTS = ['school-app-inventory.onrender.com'] 
+ALLOWED_HOSTS = ['school-app-inventory.onrender.com', '127.0.0.1'] 
 
 
 # Then api link to interact with frontend is "school-app-inventory.onrender.com/api/token/<link> "
@@ -66,6 +66,7 @@ INSTALLED_APPS = [
 
     'school_app',
     'accounts_app',
+    'library_app',
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
@@ -113,12 +114,12 @@ REST_FRAMEWORK = {
     )
 }
 
-# Static files configuration
-#STATIC_URL = 'static/'
-#STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # static files are collected here
-#STATICFILES_DIRS = [
- #   os.path.join(BASE_DIR, 'static'),  # all static files go here
-#]
+#Static files configuration
+STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # static files are collected here
+STATICFILES_DIRS = [
+   os.path.join(BASE_DIR, 'static'),  # all static files go here
+]
 
 if not DEBUG:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

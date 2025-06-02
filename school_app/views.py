@@ -20,89 +20,6 @@ from django.contrib.auth import authenticate
 from rest_framework.exceptions import ValidationError 
 
 # Create your views here.
-# class RegisterView(APIView):
-    
-#     def post(self, request):
-#         serializer = UserSerializer (data = request.data)
-#         serializer.is_valid(raise_exception=True)
-#         serializer.save()
-        
-#         return Response(
-#             {"message": "User has been created successfully", "user": serializer.data},
-#             status=status.HTTP_201_CREATED
-# )
-    
-    
-# class LoginView(APIView):
-#     def post(self, request):
-#         username = request.data.get("username")
-#         password = request.data.get("password")
-#         email = request.data.get("email")
-#         user_type= request.data.get('user_type')
-        
-#         user = authenticate(username=username,password=password, email=email, user_type=user_type)
-        
-#         if user:
-#             token, created = Token.objects.get_or_create(user=user)
-#             return Response({
-#                 'user_id':user.id,
-#                 "username":user.username,
-#                 "email":user.email,
-#                 "user_type":user_type
-#             })
-#         return Response({'error':'Invalid Credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-    
-    
-    
-# class StudentView(APIView):
-#     permission_classes=[IsAuthenticated]
-    
-#     def post(self, request):
-#         if request.user.user_type != UserTypes.STUDENT:
-#             return Response({"error":"You are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
-        
-#         serializer = StudentSerializer(data=request.data)
-#         serializer.is_valid(raise_exception=True)
-#         serializer.save()
-        
-#         return Response(serializer.data)
-    
-#     def get(self,request):
-#         user_id = request.query_params.get('id')
-#         if user_id:
-#             student = get_object_or_404(Student, user_id=user_id)
-#             serializer = StudentSerializer(student)
-#             return Response(serializer.data)
-#         else:
-#             students = Student.objects.all()
-#             serializer = StudentSerializer(students, many=True)
-#             return Response(serializer.data)
-        
-        
-        
-# class lecturerView(APIView):
-#     permission_classes=[IsAuthenticated]
-    
-#     def post (self, request):
-#         if request.user.user_type != UserTypes.LECTURER:
-#             return Response({"error":"You are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
-#         serializer = LecturerSerializer(data=request.data)
-#         serializer.is_valid(raise_exception=True)
-#         serializer.save()
-        
-#         return Response(serializer.data)
-    
-#     def get (self, request):
-#         lecturer_id = request.query_params.get('Id')
-#         if lecturer_id:
-#             lecturer = get_object_or_404(LecturerProfile, lecturer_id=lecturer_id)
-#             serializer = LecturerSerializer(lecturer)
-#             return Response(serializer.data)
-#         else:
-#             lecturers = LecturerProfile.objects.all()
-#             serializer = LecturerSerializer(lecturers, many=True)
-#             return Response(serializer.data)
-        
         
 class DepartmentView(APIView):
     permission_classes=[IsAuthenticated]
@@ -116,7 +33,7 @@ class DepartmentView(APIView):
         
         if pk:
             department = self.get_object(pk)
-            serializer= DepartmentSerializer(department, many=True, context={'request':request})
+            serializer= DepartmentSerializer(department, context={'request':request})
             return Response(serializer.data, status=status.HTTP_200_OK)
         
         else:
@@ -146,7 +63,6 @@ class PaymentView(APIView):
     def post(self, request):
         serializer = PaymentSerializer(data = request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
         
         admission_number = request.data.get('admission_number')
         if not admission_number:
@@ -243,7 +159,7 @@ class ResultView(APIView):
     
     
     def get(self, request):
-        if request.user.user_type == 'Lecturer':
+        if request.user.user_type == UserTypes.LECTURER:
             return Response(
                 {"error":"Lecturers can not have Result record. Please login as a student"},
                 status=status.HTTP_403_FORBIDDEN
@@ -309,6 +225,8 @@ class AnnouncementView(APIView):
         
         return Response(serializer.data)
     
+    def get_object(self, pk):
+        return get_object_or_404(Announcement, pk=pk)
     
     def delete(self, request, pk, format=None):
         if request.user.user_type != UserTypes.LECTURER and not request.user.is_staff and not request.user.is_admin:
@@ -360,10 +278,10 @@ class CommentView(APIView):
     
     def post(self, request):
         serializer = Commentserializer(data=request.data)
-        serializer.is_valid()
+        serializer.is_valid(raise_exception=True)
         serializer.save()
         
-        return serializer
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
     
     def get(self, request):
         comment = Comment.objects.filter()
