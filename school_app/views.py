@@ -7,8 +7,8 @@ from school_app.serializers import  (ExamSerializer,
                         PaymentSerializer, ReceiptSerializer, 
                         IdentityCardSerializer, ResultSerializer,
                         AnnouncementSerializer, PostSerializer,
-                        RepostSerializer, Commentserializer, LectureSerializer,
-                        NotificationSerializer, DepartmentSerializer)
+                        RepostSerializer, CommentSerializer, LectureSerializer,
+                        NotificationSerializer, DepartmentSerializer, CalendarSerializer, TimeTableSerializer, CourseSerializer)
 
 from school_app.models import ( Receipt, Result, IdentityCard, CustomUser, Announcement, 
             Post, Repost, Comment, Lecture, UserTypes, Payment, Exam,
@@ -55,6 +55,19 @@ class DepartmentView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
             
            
+class CourseView(APIView):
+    permission_classes=[IsAuthenticated]
+    
+    
+    def post(self, request):
+        if request.user.user_type == UserTypes.STUDENT:
+            return Response({"error":"You are not authorized to create a Time Table"}, status=status.HTTP_403_FORBIDDEN)
+        
+        serializer=CourseSerializer(data=request.data, context={"request":request})
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(user=request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
     
     
 class PaymentView(APIView):
@@ -107,6 +120,8 @@ class PaymentView(APIView):
             payments = Payment.objects.filter(admission_number=admission_number)
         else:
             payments = Payment.objects.all()
+            
+            
             serializer = PaymentSerializer(payments, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
     
@@ -123,6 +138,10 @@ class IdCardView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     def get(self, request):
+        
+        if not user_id:
+            cards = IdentityCard.objects.filter(user=request.user)
+
         if (request.user.user_type == UserTypes.LECTURER or request.user.is_hod or request.user.is_admin):
             return Response(
                 {"error":"You are not authorized to have this ID card. Get a staff ID card instead"},
@@ -149,6 +168,10 @@ class ResultView(APIView):
     permission_classes=[IsAuthenticated]
     
     def post(self, request):
+        
+        if request.user.user_type == UserTypes.STUDENT:
+            return Response({"Error":"Only staffs are allowed to post a result"}, status=status.HTTP_403_FORBIDDEN)
+        
         serializer = ResultSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -209,7 +232,7 @@ class AnnouncementView(APIView):
     permission_classes=[IsAuthenticated]
     
     def post(self, request):
-        if request.user.user_type != UserTypes.LECTURER and not request.user.is_staff:
+        if request.user.user_type != UserTypes.LECTURER and not request.user.is_staff and not request.user.is_admin:
             return Response({"error":"You are not authorized to perform this action"}, status=status.HTTP_403_FORBIDDEN)
         serializer = AnnouncementSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -243,15 +266,14 @@ class PostView(APIView):
     permission_classes=[IsAuthenticated]
     
     def post(self, request):
-        serializer= PostSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        
+        serializer= PostSerializer(data=request.data, context={"request":request})
+        if serializer.is_valid(raise_exception=True):
+            serializer.save() 
         return Response(serializer.data)
     
     def get(self, request):
         post= Post.objects.filter()
-        serializer = PostSerializer(post, many=True)
+        serializer = PostSerializer(post, many=True, context={"request":request})
         
         return Response(serializer.data)
     
@@ -260,7 +282,7 @@ class RepostView(APIView):
     permission_classes=[IsAuthenticated]
     
     def post(self, request):
-        serializer= RepostSerializer(data=request.data)
+        serializer= RepostSerializer(data=request.data, context={"request":request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         
@@ -268,16 +290,15 @@ class RepostView(APIView):
     
     def get(self, request):
         post= Repost.objects.filter()
-        serializer = RepostSerializer(post, many=True)
+        serializer = RepostSerializer(post, many=True, context={"request":request})
         
         return Response(serializer.data)
 
 
 class CommentView(APIView):
-    permission_classes=[IsAuthenticated]
     
     def post(self, request):
-        serializer = Commentserializer(data=request.data)
+        serializer = CommentSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         
@@ -285,7 +306,7 @@ class CommentView(APIView):
     
     def get(self, request):
         comment = Comment.objects.filter()
-        seirializer = Commentserializer(comment, many=True)
+        seirializer = CommentSerializer(comment, many=True)
         
         return Response(seirializer.data)
     
@@ -330,6 +351,8 @@ class LectureView(APIView):
     
     
 class ExamView(APIView):
+    permission_classes=[IsAuthenticated]
+    
     def post(self, request):
         if request.user.user_type != UserTypes.LECTURER and not request.user.is_staff and not request.user.is_admin:
             return Response({"error":"You are not authorized to carry out this action"}, status=status.HTTP_403_FORBIDDEN)
@@ -375,9 +398,46 @@ class NotificationView(APIView):
     
     def post(self, request):
         serializer = NotificationSerializer(data=request.data, context={"request":request})
-        serializer.is_valid(raise_exception=True)
-        
-        serializer.save()
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    
+class CalendarView(APIView):
+    permission_classes=[IsAuthenticated]
+    
+    def get(self, request):
+        calendars=Calendar.objects.filter(user=request.user)
+        serializer=CalendarSerializer(calendars, many=True, context={"request":request})
+        
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def post(self, request):
+        serializer=CalendarSerializer(data=request.data, context={"request":request})
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    
+class TimeTableView(APIView):
+    permission_classes=[IsAuthenticated]
+    
+    def get(self, request):
+        time_tables=TimeTable.objects.filter(user=request.user)
+        serializer= TimeTableSerializer(time_tables, many=True, context={"request":request})
+        
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def post(self, request):
+        if request.user.user_type == UserTypes.STUDENT:
+            return Response({"error":"You are not authorized to create a Time Table"})
+        
+        serializer=TimeTableSerializer(data=request.data, context={"request":request})
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(user=request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        
+    
 
-# Course, AcademicSession, Calendar, TimeTable
+# Course, TimeTable

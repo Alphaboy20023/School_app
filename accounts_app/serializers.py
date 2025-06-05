@@ -5,11 +5,9 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from datetime import date
 from django.conf import settings
 from rest_framework.exceptions import ValidationError
-from django.utils import timezone
-from django.db import transaction
 from dateutil.relativedelta import relativedelta
-
-from accounts_app.models import LecturerProfile, CustomUser, Student
+from django.contrib.auth import authenticate
+from accounts_app.models import LecturerProfile, CustomUser, Student, UserTypes
 
 
 class CustomUserTokenObtainSerializer(TokenObtainPairSerializer):
@@ -70,10 +68,36 @@ class RegisterUserSerializer(serializers.ModelSerializer):
 
 
    
-class LoginSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CustomUser
-        fields = ['username','password','user_type']
+class LoginSerializer(serializers.Serializer):
+    username= serializers.CharField()
+    password= serializers.CharField(write_only=True)
+    email=serializers.EmailField(required=False)
+    user_type= serializers.ChoiceField(choices=UserTypes.choices, required=False)
+    
+    def validate(self, data):
+        username= data.get('username')
+        password= data.get('password')
+        email=data.get('email')
+        user_type=data.get('user_type')
+        
+        user= authenticate(username=username, password=password)
+        
+        if user is None:
+           raise serializers.ValidationError('Invalid Username or Password')
+       
+        if email and user.email != email:
+            raise ValidationError('Email does not match accoutn')
+        
+        if user_type and user.user_type != user_type:
+            raise serializers.ValidationError('User type Mismatch')
+        
+        if not user.is_active:
+            raise serializers.ValidationError('This account has been disabled')
+        
+        
+        data['user']=user
+        return data
+        
 
 
 
@@ -85,6 +109,7 @@ class StudentSerializer(serializers.ModelSerializer):
         model=Student
         fields= ['id', 'age', 'department','admission_number', 'Faculty','level']
         read_only_fields= ['age']
+        
         
     
     def get_age(self, obj):

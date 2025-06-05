@@ -34,8 +34,8 @@ BookTransactionChoices = [
 class PhysicalBook(TimeStampField):
     title = models.CharField(max_length=400)
     type = models.CharField(max_length=50, choices=BookChoices)
-    edition = models.IntegerField()
-    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    edition = models.CharField(max_length=500, null=True, blank=True)
+    author = models.CharField(max_length=25, blank=False, null=True)
     summary = models.TextField(max_length=500000, blank=True)
     quantity = models.IntegerField(default=1)
 
@@ -122,3 +122,6 @@ class BookRecord(models.Model):
                     self.ebook.save()
 
         super().save(*args, **kwargs)
+        
+        
+

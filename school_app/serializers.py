@@ -1,7 +1,6 @@
 
 from rest_framework import serializers
-from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
 
 from school_app.models import (Payment,
     Receipt, IdentityCard, Result, Course, 
@@ -14,6 +13,9 @@ from django.conf import settings
 from rest_framework.exceptions import ValidationError
 from django.utils import timezone
 from django.db import transaction
+
+
+
 
     
 class DepartmentSerializer(serializers.ModelSerializer):
@@ -42,8 +44,19 @@ class DepartmentSerializer(serializers.ModelSerializer):
         representation= super().to_representation(instance)
         representation.pop('hod_id', None)
         return representation
-
     
+       
+class CourseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Course
+        fields=['course_name', 'code', 'department', 'description' ,'credit_units', 'level', 'semester', 'lecturer', 'created_at', 'updated_at']
+        read_only_fields=['created_at', 'updated_at']
+    
+    def create(self, validated_data):
+        course= Course.objects.create(**validated_data)
+        course.save()
+        return course
+
 
 
 class PaymentSerializer(serializers.ModelSerializer):
@@ -230,7 +243,9 @@ class AnnouncementSerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields='__all__'
+        fields=['user', 'title', 'content', 'likes', 'is_image', 'created_at', 'updated_at']
+        read_only_fields=['created_at', 'updated_at']
+    
         
     def create(self, validated_data):
         post = Post.objects.create(**validated_data)
@@ -240,7 +255,7 @@ class PostSerializer(serializers.ModelSerializer):
 class RepostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Repost
-        fields='__all__'
+        fields=['original_post', 'reposted_by']
         
     def create(self, validated_data):
         repost = Repost.objects.create(**validated_data)
@@ -249,16 +264,19 @@ class RepostSerializer(serializers.ModelSerializer):
         return repost
     
 
-class Commentserializer(serializers.ModelSerializer):
+class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = '__all__'
+        fields = ['user', 'post', 'description', 'created_at', 'updated_at']
+        read_only_fields=['created_at', 'updated_at']
+        
         
     def create(self, validated_data):
         comment = Comment.objects.create(**validated_data)
         comment.save()
         
         return comment
+    
     
 class LectureSerializer(serializers.ModelSerializer):
     
@@ -388,7 +406,7 @@ class ExamSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
         
-        if questions_data is None:
+        if questions_data is not None:
             instance.question_set.all().delete()
             for question_data in questions_data:
                 Question.objects.create(exam=instance, **question_data)
@@ -419,7 +437,7 @@ class NotificationSerializer(serializers.ModelSerializer):
         model = Notification
         fields = '__all__'
      
-    def create(self, validated_data, request):
+    def create(self, validated_data):
         user = CustomUser.objects.create(
         email = validated_data['email'], username = validated_data['username'],user_type = validated_data['user_type'])
         
@@ -438,6 +456,18 @@ class CalendarSerializer(serializers.ModelSerializer):
         calendar.save()
         return calendar
     
-    #def
+class TimeTableSerializer(serializers.ModelSerializer):
+    class Meta:
+        model= TimeTable
+        fields=['week_day', 'start_time', 'end_time', 'course', 'lecturer', 'academic_session', 'semester', 'duration', 'venue']
+        read_only_fields=['lecturer', 'course']
+        
+    def create(self, validated_data):
+        time_table=TimeTable.objects.create(**validated_data)
+        time_table.save()
+        return time_table
+    
+
+        
     
 
