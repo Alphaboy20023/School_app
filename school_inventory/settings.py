@@ -24,10 +24,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-6n2k2*$x3f$ly4#-l_9ta+$q3)$+9xhqr3pp947i5thmk++svb')
 
 
-DEBUG=True
+DEBUG=False
 
 # * allow any host
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    'inventory-management-solution-production.up.railway.app',
+    '*', 
+]
 
 
 
