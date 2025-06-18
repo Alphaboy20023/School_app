@@ -24,7 +24,7 @@ Status_choices= {
 }
 
 class Payment(TimeStampField):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='user')
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='user', blank=True, null=True)
     admission_number = models.ForeignKey('accounts_app.Student', on_delete=models.CASCADE, related_name='student')
     admin_fee=models.DecimalField(max_digits=8, decimal_places=2)
     course_fee=models.DecimalField(max_digits=8, decimal_places=2, default=Decimal('0.00'))
@@ -171,13 +171,13 @@ class Result(TimeStampField):
 
 
 class Announcement(TimeStampField):
-    user= models.ForeignKey(CustomUser, on_delete=models.CASCADE, blank=True)
+    user= models.ForeignKey(CustomUser, on_delete=models.CASCADE, blank=True, null=True)
     title= models.CharField(max_length=50, blank=True)
     information = models.CharField(max_length=10000, blank=True)
 
 
 class Post(TimeStampField):
-    user=models.ForeignKey(CustomUser, on_delete=models.CASCADE, blank=True)
+    user=models.ForeignKey(CustomUser, on_delete=models.CASCADE, blank=True, null=True)
     title = models.CharField(max_length=5000, blank=True)
     content = models.CharField(max_length=5000, blank=True)
     likes = models.ManyToManyField(CustomUser, related_name='liked_posts')
@@ -192,13 +192,13 @@ class Repost(Post):
 
     
 class Comment(TimeStampField):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, blank=True, null=True)
     post = models.ForeignKey('Post', on_delete=models.CASCADE)
     description = models.TextField(max_length=150, blank=True)
 
 
 class Notification(TimeStampField):
-    user = models.ForeignKey(CustomUser,on_delete=models.CASCADE,)
+    user = models.ForeignKey(CustomUser,on_delete=models.CASCADE,blank=True, null=True)
     message= models.TextField()
     is_read = models.BooleanField(default=False)
     link = models.URLField(max_length=500, blank=True, null=True)

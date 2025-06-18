@@ -102,7 +102,7 @@ faculty_choices =[
 
 
 class Student(TimeStampField):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, limit_choices_to={'user_type':UserTypes.STUDENT})
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, limit_choices_to={'user_type':UserTypes.STUDENT}, null=True, blank=True)
     date_of_birth=models.DateField(blank=True, null=True)
     current_session = models.ForeignKey('school_app.AcademicSession', on_delete=models.SET_NULL, null=True)
     department = models.ForeignKey('school_app.Department', on_delete=models.SET_NULL, null=True)
