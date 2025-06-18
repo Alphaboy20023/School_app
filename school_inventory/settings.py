@@ -27,10 +27,9 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-6n2k2*$x3f$ly4#-l_9ta
 DEBUG=False
 
 # * allow any host
-ALLOWED_HOSTS = [
-    'inventory-management-solution-production.up.railway.app',
-    '*', 
-]
+ALLOWED_HOSTS = ["inventory-management-solution-production.up.railway.app", "localhost", "127.0.0.1"]
+CSRF_TRUSTED_ORIGINS = ["https://inventory-management-solution-production.up.railway.app"]
+
 
 
 
@@ -182,5 +181,5 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
-print("DEBUG:", DEBUG)
-print("ALLOWED_HOSTS:", ALLOWED_HOSTS)
+# print("DEBUG:", DEBUG)
+# print("ALLOWED_HOSTS:", ALLOWED_HOSTS)
