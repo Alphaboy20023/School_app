@@ -27,10 +27,11 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-6n2k2*$x3f$ly4#-l_9ta
 DEBUG = os.environ.get('DEBUG', 'FALSE')  == 'True'
 
 # * allow any host
-ALLOWED_HOSTS = ['*'] 
-
-
-# Then api link to interact with frontend is "school-app-inventory.onrender.com/api/token/<link> "
+ALLOWED_HOSTS = [
+    'inventory-management-solution-production.up.railway.app',
+    '127.0.0.1',
+    'localhost',
+]
 
 
 AUTH_USER_MODEL = 'accounts_app.CustomUser'
