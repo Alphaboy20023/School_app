@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-6n2k2*$x3f$ly4#-l_9ta+$q3)$+9xhqr3pp947i5thmk++svb')
 
 
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'FALSE')  == 'True'
 
 # * allow any host
 ALLOWED_HOSTS = ['school-app-inventory.onrender.com', '127.0.0.1'] 
@@ -39,20 +39,13 @@ AUTH_USER_MODEL = 'accounts_app.CustomUser'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-
-DATABASE_URL = os.environ.get('DATABASE_URL')
-
-if DATABASE_URL:
-    DATABASES = {
-        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=True)
-    }
-else:
-    DATABASES = {
-        'default': dj_database_url.config(
-            default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),
-            conn_max_age=600
-        )
-    }
+DATABASES = {
+    'default': dj_database_url.config(
+        default=os.getenv('DATABASE_URL'),
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
+}
 
 # print("DATABASE_URL:", os.environ.get('DATABASE_URL'))
 
@@ -115,11 +108,11 @@ REST_FRAMEWORK = {
 }
 
 #Static files configuration
-STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # static files are collected here
-STATICFILES_DIRS = [
-   os.path.join(BASE_DIR, 'static'),  # all static files go here
-]
+# STATIC_URL = 'static/'
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # static files are collected here
+# STATICFILES_DIRS = [
+#    os.path.join(BASE_DIR, 'static'),  # all static files go here
+# ]
 
 if not DEBUG:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
