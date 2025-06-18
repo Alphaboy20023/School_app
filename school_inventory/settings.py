@@ -27,11 +27,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-6n2k2*$x3f$ly4#-l_9ta
 DEBUG=True
 
 # * allow any host
-ALLOWED_HOSTS = [
-    'inventory-management-solution-production.up.railway.app',
-    '127.0.0.1',
-    'localhost',
-]
+ALLOWED_HOSTS = ['*']
 
 
 
