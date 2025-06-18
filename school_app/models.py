@@ -30,7 +30,7 @@ class Payment(TimeStampField):
     course_fee=models.DecimalField(max_digits=8, decimal_places=2, default=Decimal('0.00'))
     library_fee = models.DecimalField(max_digits=8, decimal_places=2, default=Decimal('0.00')) 
     total= models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True, default=Decimal('0.00'))
-    status=models.CharField(choices=Status_choices, blank=True, null=True, )
+    status=models.CharField(choices=Status_choices, blank=True, null=True,max_length=100 )
     transaction_id = models.CharField(max_length=20, null=True, blank=True)
     
     def save(self, *args, **kwargs):
@@ -222,7 +222,7 @@ class Calendar(TimeStampField):
     event_date = models.DateField(blank=True, null=True)
     start_time = models.TimeField(blank=True, null=True)
     end_time = models.TimeField(blank=True, null=True)
-    event_type = models.CharField( choices=event_type_choices, default='Academic')
+    event_type = models.CharField( choices=event_type_choices, default='Academic', max_length=100)
     
     class Meta:
         ordering = ['event_date', 'start_time']
@@ -242,7 +242,7 @@ day_choices = [
 
 
 class TimeTable(TimeStampField):
-    week_day = models.CharField( choices=day_choices, default='Monday')
+    week_day = models.CharField( choices=day_choices, default='Monday', max_length=100)
     start_time = models.TimeField(null=True)
     end_time = models.TimeField(null=True)
     course = models.ForeignKey('Course', on_delete=models.CASCADE, null=True)

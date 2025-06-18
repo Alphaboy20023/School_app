@@ -48,8 +48,6 @@ DATABASES = {
     )
 }
 
-# print("DATABASE_URL:", os.environ.get('DATABASE_URL'))
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -109,11 +107,11 @@ REST_FRAMEWORK = {
 }
 
 #Static files configuration
-# STATIC_URL = 'static/'
-# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # static files are collected here
-# STATICFILES_DIRS = [
-#    os.path.join(BASE_DIR, 'static'),  # all static files go here
-# ]
+STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # static files are collected here
+STATICFILES_DIRS = [
+   os.path.join(BASE_DIR, 'static'),  # all static files go here
+]
 
 if not DEBUG:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
@@ -133,6 +131,9 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+# print("ALLOWED_HOSTS =", ALLOWED_HOSTS)
+
 
 
 LANGUAGE_CODE = 'en-us'
