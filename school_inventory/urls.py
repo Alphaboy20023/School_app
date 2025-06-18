@@ -24,7 +24,3 @@ urlpatterns = [
     path('library/', include('library_app.urls'))
 
 ]
-
-"""
-there is  nothing like school/api/token/refresh? hope token wont affect? 
-"""
