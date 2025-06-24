@@ -14,11 +14,13 @@ from django.contrib.auth import authenticate
 
 class RegisterView(APIView):
     permission_classes=[AllowAny]
-    def post(self, request):
-        serializer = UserSerializer (data = request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        
+    
+    
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        self.perform_create(serializer)
         return Response(
             {"message": "User has been created successfully", "user": serializer.data},
             status=status.HTTP_201_CREATED
