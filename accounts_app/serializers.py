@@ -71,25 +71,15 @@ class RegisterUserSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     username= serializers.CharField()
     password= serializers.CharField(write_only=True)
-    email=serializers.EmailField(required=False)
-    user_type= serializers.ChoiceField(choices=UserTypes.choices, required=False)
     
     def validate(self, data):
         username= data.get('username')
         password= data.get('password')
-        email=data.get('email')
-        user_type=data.get('user_type')
         
         user= authenticate(username=username, password=password)
         
         if user is None:
            raise serializers.ValidationError('Invalid Username or Password')
-       
-        if email and user.email != email:
-            raise ValidationError('Email does not match accoutn')
-        
-        if user_type and user.user_type != user_type:
-            raise serializers.ValidationError('User type Mismatch')
         
         if not user.is_active:
             raise serializers.ValidationError('This account has been disabled')
