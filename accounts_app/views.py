@@ -13,15 +13,21 @@ from django.contrib.auth import authenticate
 # Create your views here.
 
 class RegisterView(APIView):
-    permission_classes=[AllowAny]
+    permission_classes = [AllowAny]
+
     def post(self, request):
-        serializer = RegisterUserSerializer (data = request.data)
-        if serializer.is_valid(raise_exception=True):
+        print("Incoming data:", request.data)  # DEBUG
+        serializer = RegisterUserSerializer(data=request.data)
+        if serializer.is_valid():
             serializer.save()
-        return Response(
-            {"message": "User has been created successfully", "user": serializer.data},
-            status=status.HTTP_201_CREATED
-)
+            return Response({
+                "message": "User has been created successfully",
+                "user": serializer.data
+            }, status=status.HTTP_201_CREATED)
+        else:
+            print("Serializer errors:", serializer.errors)  # DEBUG
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     
     
 class LoginView(APIView):
