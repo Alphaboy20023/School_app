@@ -31,7 +31,13 @@ ALLOWED_HOSTS = ["inventory-management-solution-production-f79d.up.railway.app",
 CSRF_TRUSTED_ORIGINS = ["https://inventory-management-solution-production.up.railway.app"]
 
 
+CORS_ALLOW_ALL_ORIGINS = False
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
+
+CORS_ALLOW_CREDENTIALS = True
 
 
 AUTH_USER_MODEL = 'accounts_app.CustomUser'
@@ -70,6 +76,7 @@ MIDDLEWARE = [
     #whoite noise should be after security
     'whitenoise.middleware.WhiteNoiseMiddleware', 
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
