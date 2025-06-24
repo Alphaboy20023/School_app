@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from accounts_app.serializers import  ( UserSerializer, StudentSerializer,  LecturerSerializer, LoginSerializer)
 from accounts_app.models import  UserTypes
 from accounts_app.models import LecturerProfile, Student
@@ -13,7 +13,7 @@ from django.contrib.auth import authenticate
 # Create your views here.
 
 class RegisterView(APIView):
-    
+    permission_classes=[AllowAny]
     def post(self, request):
         serializer = UserSerializer (data = request.data)
         serializer.is_valid(raise_exception=True)
