@@ -16,7 +16,7 @@ class RegisterView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        print("Incoming data:", request.data)
+        # print("Incoming data:", request.data)
 
         serializer = RegisterUserSerializer(data=request.data)
         try:
@@ -29,7 +29,7 @@ class RegisterView(APIView):
                     "user": serializer.data
                 }, status=status.HTTP_201_CREATED)
         except Exception as e:
-            print("❌ Error during registration:", e)
+            # print("❌ Error during registration:", e)
             return Response({"error": str(e)}, status=500)
 
     
