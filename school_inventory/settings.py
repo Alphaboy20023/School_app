@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-6n2k2*$x3f$ly4#-l_9ta+$q3)$+9xhqr3pp947i5thmk++svb')
 
 
-DEBUG=True
+DEBUG=False
 
 # * allow any host
 ALLOWED_HOSTS = ["inventory-management-solution-production-f79d.up.railway.app", "localhost", "127.0.0.1","school-app-7dqb.onrender.com"]
