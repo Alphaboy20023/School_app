@@ -51,6 +51,10 @@ if DATABASE_URL:
     DATABASES= {
         'default':dj_database_url.parse(DATABASE_URL, conn_max_age=600, conn_health_checks=True)
     }
+    
+    DATABASES['default']['OPTIONS'] = {
+        'options': '-c search_path=school_inventory'
+    }
 else:
     print('⚠️ DATABASE_URL not found. Falling back to SQLite...')
     DATABASES= {
